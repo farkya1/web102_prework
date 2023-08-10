@@ -70,7 +70,9 @@ addGamesToPage(GAMES_JSON)
 
 // grab the contributions card element
 const contributionsCard = document.getElementById("num-contributions");
-contributionsCard.innerHTML = GAMES_JSON.reduce((acc,game)=>{return acc + game.backers},0).toLocaleString('en-US')
+contributionsCard.innerHTML = GAMES_JSON.reduce((acc,game)=>{
+    return acc + game.backers
+  },0).toLocaleString('en-US')
 
 // use reduce() to count the number of total contributions by summing the backers
 
@@ -80,7 +82,9 @@ contributionsCard.innerHTML = GAMES_JSON.reduce((acc,game)=>{return acc + game.b
 
 // grab the amount raised card, then use reduce() to find the total amount raised
 const raisedCard = document.getElementById("total-raised");
-raisedCard.innerHTML = "$"+GAMES_JSON.reduce((acc,game)=>{return acc + game.pledged},0).toLocaleString('en-US')
+raisedCard.innerHTML = "$"+GAMES_JSON.reduce((acc,game)=>{
+    return acc + game.pledged
+  },0).toLocaleString('en-US')
 
 // set inner HTML using template literal
 
@@ -101,9 +105,12 @@ function filterUnfundedOnly() {
     deleteChildElements(gamesContainer);
 
     // use filter() to get a list of games that have not yet met their goal
-
+    let unfundedGames = GAMES_JSON.filter( (game) => {
+        return game.pledged < game.goal;
+      });
 
     // use the function we previously created to add the unfunded games to the DOM
+    addGamesToPage(unfundedGames)
 
 }
 
@@ -112,10 +119,12 @@ function filterFundedOnly() {
     deleteChildElements(gamesContainer);
 
     // use filter() to get a list of games that have met or exceeded their goal
-
+    let fundedGames = GAMES_JSON.filter( (game) => {
+        return game.pledged >= game.goal;
+      });
 
     // use the function we previously created to add unfunded games to the DOM
-
+    addGamesToPage(fundedGames)
 }
 
 // show all games
@@ -123,6 +132,7 @@ function showAllGames() {
     deleteChildElements(gamesContainer);
 
     // add all games from the JSON data to the DOM
+    addGamesToPage(GAMES_JSON)
 
 }
 
@@ -132,6 +142,9 @@ const fundedBtn = document.getElementById("funded-btn");
 const allBtn = document.getElementById("all-btn");
 
 // add event listeners with the correct functions to each button
+unfundedBtn.addEventListener('click',filterUnfundedOnly)
+fundedBtn.addEventListener("click",filterFundedOnly)
+allBtn.addEventListener("click",showAllGames)
 
 
 /*************************************************************************************
