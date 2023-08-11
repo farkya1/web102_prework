@@ -115,6 +115,12 @@ function filterUnfundedOnly() {
     // use the function we previously created to add the unfunded games to the DOM
     addGamesToPage(unfundedGames)
 
+    const gameCards = document.getElementsByClassName("game-card")
+
+    for (let i = 0; i < gameCards.length; i++){
+        gameCards[i].addEventListener('click', handleGameClick)
+    }
+
 }
 
 // show only games that are fully funded
@@ -128,6 +134,12 @@ function filterFundedOnly() {
 
     // use the function we previously created to add unfunded games to the DOM
     addGamesToPage(fundedGames)
+
+    const gameCards = document.getElementsByClassName("game-card")
+
+    for (let i = 0; i < gameCards.length; i++){
+        gameCards[i].addEventListener('click', handleGameClick)
+    }
 }
 
 // show all games
@@ -136,6 +148,12 @@ function showAllGames() {
 
     // add all games from the JSON data to the DOM
     addGamesToPage(GAMES_JSON)
+
+    const gameCards = document.getElementsByClassName("game-card")
+
+    for (let i = 0; i < gameCards.length; i++){
+        gameCards[i].addEventListener('click', handleGameClick)
+    }
 
 }
 
@@ -171,7 +189,6 @@ const displayStr = `A total of $${totalAmountRaised.toLocaleString('en-US')} has
 const gameP = document.createElement('p');
 
 gameP.innerHTML = displayStr
-console.log(displayStr)
 descriptionContainer.append(gameP)
 
 
@@ -189,7 +206,92 @@ const sortedGames =  GAMES_JSON.sort( (item1, item2) => {
 });
 
 // use destructuring and the spread operator to grab the first and second games
+const [one, two, ...rest] = sortedGames;
+
+
 
 // create a new element to hold the name of the top pledge game, then append it to the correct element
+const firstGame = document.createElement('p');
+
+firstGame.innerHTML = one.name
+firstGameContainer.append(firstGame)
 
 // do the same for the runner up item
+const secondGame = document.createElement('p');
+
+secondGame.innerHTML = two.name
+secondGameContainer.append(secondGame)
+
+// game expansion
+
+const gameCards = document.getElementsByClassName("game-card")
+
+
+//Adds listeners to all the games
+for (let i = 0; i < gameCards.length; i++){
+    gameCards[i].addEventListener('click', handleGameClick)
+}
+
+//Gets the pledged and goals for the desired game
+function getPledgedGoals(goalName){
+    
+    for(let i = 0; i < GAMES_JSON.length; i++){
+        if(GAMES_JSON[i].name === goalName.innerHTML){
+            return [GAMES_JSON[i].pledged, GAMES_JSON[i].goal]
+        }
+    }
+}
+
+function handleGameClick(event){
+
+    // the pladge and goal to be removed
+    const elementsToRemove = document.querySelectorAll(".toBeRemoved");
+
+    // gets the selected game
+    const prevousSelected = document.querySelectorAll(".selectedGame");
+
+    // Loop through the elements and remove each one
+    elementsToRemove.forEach(element => {
+        element.remove();
+    });
+
+    //reverts the background color
+    if(prevousSelected.length){
+        prevousSelected.forEach(element => {
+            element.classList.remove("selectedGame");
+        });
+    }
+    
+    let game;
+
+    //checks to see if the user selected a div or its child
+    if(event.target.tagName === "DIV"){
+        game = event.target
+    }
+    else{
+        game = event.target.parentNode
+    }
+
+    //Checks to see if the pledge and goal are already visible
+    if(game.childElementCount != 4){
+        return
+    }
+
+    //gets the game name
+    const gameName = game.querySelector('h3')
+    
+    const pledgeGoal = getPledgedGoals(gameName)
+
+    const gamePledges = document.createElement('p')
+    gamePledges.classList.add("toBeRemoved")
+
+    gamePledges.innerHTML = "Pledged: $"+pledgeGoal[0]
+    game.append(gamePledges)
+
+    const gameGoal = document.createElement('p')
+    gameGoal.classList.add("toBeRemoved")
+
+    gameGoal.innerHTML = "Goal: $"+pledgeGoal[1]
+    game.append(gameGoal)
+    game.classList.add("selectedGame");
+}
